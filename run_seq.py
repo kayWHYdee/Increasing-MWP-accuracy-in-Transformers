@@ -213,7 +213,7 @@ for fold in trange(5, desc="Folds", unit="fold"):
 
             val_acc = eq_acc = n_tot = 0
             t1 = time.time()
-            for tb in tqdm(test_pairs, desc="Testing", unit="ex", leave=False):
+            for tb in tqdm(test_pairs, desc="Testing", unit="ex", leave=True):
                 res = evaluate_tree(
                     tb[0], tb[1], generate_nums,
                     encoder, predict, generate, merge,
@@ -223,10 +223,13 @@ for fold in trange(5, desc="Folds", unit="fold"):
                 vac, eqc, _, _ = compute_prefix_tree_result(
                     res, tb[2], output_lang, tb[4], tb[6]
                 )
-                val_acc += vac; eq_acc += eqc; n_tot += 1
-
-            print(f"→ Test eq_acc={eq_acc/n_tot:.4f}, val_acc={val_acc/n_tot:.4f} "
-                  f"time={time_since(time.time()-t1)}")
+                val_acc += vac; eq_acc += eqc; tot += 1
+        
+            print()  # ensure next output starts on a new line
+            print("→ Evaluation complete, back to training")
+            print(f"→ Test eq_acc={eq_acc/tot:.4f}, val_acc={val_acc/tot:.4f} "
+                  f"time={time_since(time.time()-eval_start)}")
+            
 
             torch.save(encoder.state_dict(),  f"models/enc_f{fold}.pt")
             torch.save(predict.state_dict(),  f"models/pred_f{fold}.pt")
