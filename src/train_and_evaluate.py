@@ -1028,7 +1028,10 @@ def evaluate_tree(input_batch, input_length, generate_nums,
                 print("  sample num_score :", num_score[0,:5].data.cpu().numpy(), "…")
                 print("  after gating top5:", combined[0].topk(5)[0].data.cpu().numpy())
 
-            topv, topi = out_score.topk(beam_size, dim=1)
+            # topv, topi = out_score.topk(beam_size, dim=1)
+            # allow fewer candidates than beam_size if that's all we have
+            k = min(beam_size, out_score.size(1))
+            topv, topi = out_score.topk(k, dim=1)
             for tv, ti in zip(topv.split(1, dim=1), topi.split(1, dim=1)):
                 tok      = int(ti)
                 new_score = b.score + float(tv)
