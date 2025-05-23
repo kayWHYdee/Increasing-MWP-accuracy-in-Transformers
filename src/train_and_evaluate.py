@@ -1006,12 +1006,20 @@ def evaluate_tree(input_batch, input_length, generate_nums,
             )
 
             # Gate logits with leaf vs. nonleaf
-            leaf_lp    = p_leaf[:, 0].unsqueeze(1).repeat(1, op_logits.size(1))
-            nonleaf_lp = p_leaf[:, 1].unsqueeze(1).repeat(1, num_score.size(1))
-            action_logits = torch.cat((op_logits, num_score), dim=1)
-            gate_logits   = torch.cat((leaf_lp, nonleaf_lp), dim=1)
-            combined = action_logits + gate_logits
-            out_score = nn.functional.log_softmax(combined, dim=1)
+            # leaf_lp    = p_leaf[:, 0].unsqueeze(1).repeat(1, op_logits.size(1))
+            # nonleaf_lp = p_leaf[:, 1].unsqueeze(1).repeat(1, num_score.size(1))
+            # action_logits = torch.cat((op_logits, num_score), dim=1)
+            # gate_logits   = torch.cat((leaf_lp, nonleaf_lp), dim=1)
+            # combined = action_logits + gate_logits
+            # out_score = nn.functional.log_softmax(combined, dim=1)
+
+            stop_lp, expand_lp = p_leaf[0]          # two log‐probs
+            if stop_lp > expand_lp:
+                # restrict to operators only
+                out_score = nn.functional.log_softmax(op_logits, dim=1)
+            else:
+                # restrict to numbers only
+                out_score = nn.functional.log_softmax(num_score, dim=1)
             # debug print in evaluate_tree, just for the first beam of the first example
             if _ == 0 and len(beams)==1 and False:   # turn the False -> True for one debug run
                 print(">>> DEBUG INFER GATING")
