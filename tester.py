@@ -23,7 +23,7 @@ from src.updated import (
 )
 
 # ─── Hyperparameters ───────────────────────────────────────────────────────────
-DATA_PATH    = "/content/drive/MyDrive/code/data/Math_23K.json"
+DATA_PATH    = "/kaggle/input/math-23/data/Math_23K.json"
 SUBSET_RATIO = 0.2
 BATCH_SIZE   = 32
 EMBED_SIZE   = 128
